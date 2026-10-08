@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from src.catalogue import (
     generate_random_catalogue,
@@ -26,13 +27,8 @@ clustered_galaxies = generate_clustered_catalogue(
 )
 
 
-random_separations = pair_separations(
-    random_galaxies
-)
-
-clustered_separations = pair_separations(
-    clustered_galaxies
-)
+random_separations = pair_separations(random_galaxies)
+clustered_separations = pair_separations(clustered_galaxies)
 
 bins = np.logspace(
     np.log10(1.0),
@@ -40,36 +36,80 @@ bins = np.logspace(
     20
 )
 
+r = 0.5 * (bins[1:] + bins[:-1])
 
-RR = pair_counts(
-    random_separations,
-    bins
-)
 
-DD = pair_counts(
-    clustered_separations,
-    bins
-)
-
+RR = pair_counts(random_separations, bins)
+DD = pair_counts(clustered_separations, bins)
 
 
 print("Number of galaxies:", n_galaxies)
+print("Number of random pairs:", len(random_separations))
+print("Number of clustered pairs:", len(clustered_separations))
 
-print(
-    "Number of random pairs:",
-    len(random_separations)
+
+plt.figure(figsize=(8, 8))
+
+plt.scatter(
+    random_galaxies[:, 0],
+    random_galaxies[:, 1],
+    s=5,
+    alpha=0.4,
+    label="Random"
 )
 
-print(
-    "Number of clustered pairs:",
-    len(clustered_separations)
+plt.scatter(
+    clustered_galaxies[:, 0],
+    clustered_galaxies[:, 1],
+    s=5,
+    alpha=0.4,
+    label="Clustered"
 )
 
-print("\nSeparation bins:")
-print(bins)
+plt.xlabel(r"$x\ [h^{-1}\mathrm{Mpc}]$")
+plt.ylabel(r"$y\ [h^{-1}\mathrm{Mpc}]$")
+plt.title("Synthetic Galaxy Catalogues")
+plt.legend()
+plt.tight_layout()
 
-print("\nRR(r) - random pair counts:")
-print(RR)
+plt.savefig(
+    "figures/galaxy_catalogues.png",
+    dpi=300
+)
 
-print("\nDD(r) - clustered pair counts:")
-print(DD)
+plt.close()
+
+
+plt.figure(figsize=(8, 6))
+
+plt.plot(
+    r,
+    DD,
+    marker="o",
+    label="DD(r) — clustered"
+)
+
+plt.plot(
+    r,
+    RR,
+    marker="o",
+    label="RR(r) — random"
+)
+
+plt.xscale("log")
+plt.yscale("log")
+
+plt.xlabel(r"$r\ [h^{-1}\mathrm{Mpc}]$")
+plt.ylabel("Pair counts")
+
+plt.title("Galaxy Pair Counts")
+
+plt.legend()
+plt.tight_layout()
+
+plt.savefig(
+    "figures/pair_counts.png",
+    dpi=300
+)
+
+plt.close()
